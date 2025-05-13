@@ -279,7 +279,7 @@ function Chat() {
           </button>
           <button
             onClick={clearChatHistory}
-            className="w-full py-2 bg-gradient-to-r from-red-500 to-red-600 rounded-lg text-sm font-medium hover:from-red-600 hover:to-red-700 transition-all flex items-center justify-center gap-2 shadow-md"
+            className="w-full py-2 bg-gradient-to-r from-cyan-500 to-red-600 rounded-lg text-sm font-medium hover:from-red-600 hover:to-red-700 transition-all flex items-center justify-center gap-2 shadow-md"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
