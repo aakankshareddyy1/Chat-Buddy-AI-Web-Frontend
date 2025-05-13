@@ -1,6 +1,8 @@
+// Chat.jsx
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { UserContext } from '../UserContext';
 import Logout from './Logout';
+import ContactUs from './ContactUs';
 
 function Chat() {
   const { username, setUsername, setId } = useContext(UserContext);
@@ -21,6 +23,7 @@ function Chat() {
   const [showWelcome, setShowWelcome] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showContactUs, setShowContactUs] = useState(false);
   const chatEndRef = useRef(null);
 
   const uniqueTitles = Array.from(new Set(previousChats.map(chat => chat.title)));
@@ -115,6 +118,23 @@ function Chat() {
     setShowPopup(false);
   };
 
+  const openContactUs = () => {
+    setShowContactUs(true);
+  };
+
+  const closeContactUs = () => {
+    setShowContactUs(false);
+  };
+
+  const clearChatHistory = () => {
+    setPreviousChats([]);
+    setCurrentTitle(null);
+    setMessage(null);
+    setValue('');
+    setShowWelcome(true);
+    localStorage.removeItem('chatHistory');
+  };
+
   useEffect(() => {
     fetchProfile();
   }, [setUsername, setId]);
@@ -145,10 +165,31 @@ function Chat() {
   }, [currentChat]);
 
   return (
-    <div className="flex h-screen relative overflow-hidden bg-gradient-to-br from-[#1A2634] to-[#2A3B5A]">
+    <div className="flex h-screen relative overflow-hidden" style={{
+      background: 'linear-gradient(135deg, #0F2027, #203A43, #2C5364)',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Subtle Star Effect */}
+      <div className="absolute inset-0 opacity-10">
+        {[...Array(100)].map((_, i) => (
+          <span
+            key={i}
+            className="absolute bg-white rounded-full animate-twinkle"
+            style={{
+              width: `${Math.random() * 2 + 1}px`,
+              height: `${Math.random() * 2 + 1}px`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Sidebar */}
-      <div className="w-64 bg-[#1A2634] bg-opacity-95 backdrop-blur-lg text-white flex flex-col z-10 border-r border-[#2E3B4E] shadow-lg">
-        <div className="p-4 border-b border-[#2E3B4E]">
+      <div className="w-64 bg-gradient-to-br from-[#1C2E3D] via-[#2A4050] to-[#3A5570] bg-opacity-95 backdrop-blur-lg text-white flex flex-col z-10 border-r border-[#3A5570] shadow-lg">
+        <div className="p-4 border-b border-[#3A5570]">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
               <svg
@@ -214,13 +255,53 @@ function Chat() {
           )}
         </div>
         
-        <div className="p-4 border-t border-[#2E3B4E]">
+        <div className="p-4 border-t border-[#3A5570] space-y-3">
           <Logout onLogoutClick={handleLogoutClick} />
+          <button
+            onClick={openContactUs}
+            className="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg text-sm font-medium hover:from-cyan-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2 shadow-md"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+            Contact Us
+          </button>
+          <button
+            onClick={clearChatHistory}
+            className="w-full py-2 bg-gradient-to-r from-red-500 to-red-600 rounded-lg text-sm font-medium hover:from-red-600 hover:to-red-700 transition-all flex items-center justify-center gap-2 shadow-md"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+            Clear Chat History
+          </button>
         </div>
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-[#2A3B5A] bg-opacity-95 backdrop-blur-lg z-0">
+      <div className="flex-1 flex flex-col z-0">
         <div className="flex-1 overflow-y-auto p-6">
           {!currentTitle && showWelcome ? (
             <div className="text-center text-white h-full flex flex-col items-center justify-center">
@@ -352,6 +433,9 @@ function Chat() {
           </div>
         </div>
       )}
+
+      {/* Contact Us Popup */}
+      <ContactUs isOpen={showContactUs} onClose={closeContactUs} />
     </div>
   );
 }

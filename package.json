@@ -8,11 +8,12 @@
     "build": "vite build",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start":"yarn run dev"
+    "start": "yarn run dev"
   },
   "dependencies": {
     "autoprefixer": "^10.4.14",
     "axios": "^1.4.0",
+    "framer-motion": "^12.11.0",
     "lodash": "^4.17.21",
     "postcss": "^8.4.24",
     "react": "^18.2.0",

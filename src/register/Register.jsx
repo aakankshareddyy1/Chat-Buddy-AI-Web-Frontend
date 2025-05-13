@@ -45,24 +45,36 @@ function Register() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      const errorMessage = Object.values(errors)[0] || "Validation failed";
+      showPopup(errorMessage, 'error');
+      return;
+    }
 
     const url = isLoginOrRegister === 'register' ? '/register' : '/login';
     try {
-      const payload = isLoginOrRegister === 'register' 
+      const payload = isLoginOrRegister === 'register'
         ? { username, email, password, confirmPassword }
         : { username, password };
-      const { data } = await axios.post(url, payload);
+      const { data } = await axios.post(`http://localhost:4050${url}`, payload, { withCredentials: true });
+      
+      // Show server message if present
       if (data.message) {
         showPopup(data.message, data.error ? 'error' : 'success');
       }
+
+      // Handle registration success
       if (isLoginOrRegister === 'register' && !data.error) {
-        setIsLoginOrRegister('login');
-        setUsername('');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
+        showPopup("Registration Successful! Please login to continue.", 'success');
+        setTimeout(() => {
+          setIsLoginOrRegister('login');
+          setUsername('');
+          setEmail('');
+          setPassword('');
+          setConfirmPassword('');
+        }, 3000); // Delay form reset to allow popup to be seen
       } else if (!data.error) {
+        // Handle login success
         setLoggedInUsername(username);
         setId(data.id);
       }
@@ -130,13 +142,40 @@ function Register() {
         </div>
       </div>
 
+      {/* Popup for Errors, Success Messages, and Registration Success */}
       {popup && (
-        <div
-          className={`fixed top-16 right-4 p-4 rounded-lg shadow-lg text-white ${
-            popup.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-          }`}
-        >
-          {popup.message}
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+          <div className="bg-gray-900/80 backdrop-blur-lg border border-gray-700 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl transform transition-all duration-300 animate-scale-in">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  {popup.type === 'success' ? (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  ) : (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  )}
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">{popup.type === 'success' ? 'Success' : 'Error'}</h3>
+              <p className="text-gray-300 mb-6">{popup.message}</p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -156,7 +195,6 @@ function Register() {
               className="w-full px-4 py-3 bg-gray-800 bg-opacity-50 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all placeholder-gray-400"
               placeholder="Username"
             />
-            {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
           </div>
 
           {isLoginOrRegister === 'register' && (
@@ -165,11 +203,10 @@ function Register() {
               <input
                 type="email"
                 value={email}
-                onChange={(ev) => setUsername(ev.target.value)}
+                onChange={(ev) => setEmail(ev.target.value)}
                 className="w-full px-4 py-3 bg-gray-800 bg-opacity-50 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all placeholder-gray-400"
                 placeholder="Email"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
           )}
 
@@ -182,7 +219,6 @@ function Register() {
               className="w-full px-4 py-3 bg-gray-800 bg-opacity-50 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all placeholder-gray-400"
               placeholder="Password"
             />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
 
           {isLoginOrRegister === 'register' && (
@@ -195,7 +231,6 @@ function Register() {
                 className="w-full px-4 py-3 bg-gray-800 bg-opacity-50 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all placeholder-gray-400"
                 placeholder="Confirm Password"
               />
-              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
           )}
 
@@ -266,10 +301,21 @@ export default Register;
       transform: translateY(20px);
     }
   }
-  .animate-fade-in-up {
+  @keyframes scale-in {
+    from {
+      transform: scale(0.9);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  .animate-fade-in {
     animation: fade-in-up 0.3s ease-out forwards;
   }
-  .animate-fade-out-down {
+  .animate-fade-out {
     animation: fade-out-down 0.3s ease-out forwards;
+  }
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out forwards;
   }
 `}</style>
