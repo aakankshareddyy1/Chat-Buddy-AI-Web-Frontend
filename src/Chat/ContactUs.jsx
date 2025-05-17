@@ -36,7 +36,7 @@ const ContactUs = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
 
     try {
-      await fetch("https://formspree.io/f/mjkwprbo", {
+      await fetch("https://formspree.io/f/mdkgblyn", {
         method: "POST",
         body: JSON.stringify({
           to: "chatbuddyadmin@gmail.com",
